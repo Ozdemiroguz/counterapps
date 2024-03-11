@@ -57,60 +57,6 @@ class _MyDialogState extends State<MyDialog> {
       nameArabic: "حسبنا الله",
       dua: "Hasbunallah",
     ),
-    Dua(
-      id: 7,
-      nameLatin: "Hasbunallah",
-      nameArabic: "حسبنا الله",
-      dua: "Hasbunallah1",
-    ),
-    Dua(
-      id: 7,
-      nameLatin: "Hasbunallah",
-      nameArabic: "حسبنا الله",
-      dua: "Hasbunallah2",
-    ),
-    Dua(
-      id: 7,
-      nameLatin: "Hasbunallah",
-      nameArabic: "حسبنا الله",
-      dua: "Hasbunallah3",
-    ),
-    Dua(
-      id: 7,
-      nameLatin: "Hasbunallah",
-      nameArabic: "حسبنا الله",
-      dua: "Hasbunallah4",
-    ),
-    Dua(
-      id: 7,
-      nameLatin: "Hasbunallah",
-      nameArabic: "حسبنا الله",
-      dua: "Hasbunallah5",
-    ),
-    Dua(
-      id: 7,
-      nameLatin: "Hasbunallah",
-      nameArabic: "حسبنا الله",
-      dua: "Hasbunallah6",
-    ),
-    Dua(
-      id: 7,
-      nameLatin: "Hasbunallah",
-      nameArabic: "حسبنا الله",
-      dua: "Hasbunallah7",
-    ),
-    Dua(
-      id: 7,
-      nameLatin: "Hasbunallah",
-      nameArabic: "حسبنا الله",
-      dua: "Hasbunallah8",
-    ),
-    Dua(
-      id: 7,
-      nameLatin: "Hasbunallah",
-      nameArabic: "حسبنا الله",
-      dua: "Hasbunallah9",
-    ),
   ];
   String _selectedValue = "Subhanallah";
   bool isdua = true;

@@ -1,4 +1,4 @@
-package com.example.zikirmatik
+package com.zikirsayaci.zikirmatik
 
 import io.flutter.embedding.android.FlutterActivity
 
