@@ -34,6 +34,7 @@ class _HomePageState extends State<HomePage> {
     "Yükleniyor...",
     "Yükleniyor...",
     "Yükleniyor...",
+    "Yükleniyor..."
   ]);
   void initState() {
     super.initState();
@@ -104,7 +105,6 @@ class _HomePageState extends State<HomePage> {
                 color: Colors.green,
               ),
               width: double.infinity,
-              height: height * 0.4,
               padding: EdgeInsets.all(10),
               margin: EdgeInsets.all(10),
               child: Column(
@@ -200,134 +200,129 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             //griedview içinde çekilen zikir sayıları ve isimleri
-            zikirList.isEmpty
-                ? CircularProgressIndicator()
-                : Padding(
-                    padding: const EdgeInsets.only(bottom: 20),
-                    child: Container(
-                      width: double.infinity,
-                      height: height * 0.5,
-                      child: GridView.builder(
-                        //kaydıurmayı etkinleştirir
-                        physics: AlwaysScrollableScrollPhysics(),
-                        scrollDirection: Axis.vertical,
-                        shrinkWrap: true,
-                        itemCount: zikirList.length + 1,
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 10,
-                          mainAxisSpacing: 10,
-                        ),
-                        itemBuilder: (context, index) {
-                          return index == zikirList.length
-                              ? //+ butomnu yeni dua veya zikir eklemöek için
-                              Padding(
-                                  padding: index % 2 == 0
-                                      ? EdgeInsets.only(left: 10)
-                                      : EdgeInsets.only(right: 10),
-                                  child: GestureDetector(
-                                    onTap: () async {
-                                      //yeni dua dialogu açılacak
-                                      bool? result = await showDialog<bool>(
-                                        context: context,
-                                        builder: (BuildContext context) {
-                                          return MyDialog(
-                                            addedFunction: addedFunction,
-                                          );
-                                        },
-                                      );
-                                      if (result != null && result) {
-                                        _fetchZikirler();
-                                      }
-                                    },
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      padding: EdgeInsets.all(10),
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            "Yeni Dua Ekle",
-                                            style: TextStyle(
-                                              fontSize: 20,
-                                              color: Colors.green[500],
-                                            ),
-                                          ),
-                                          Icon(
-                                            Icons.add_circle_outline,
-                                            color: Colors.green[500],
-                                            size: 50,
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                )
-                              : Padding(
-                                  padding: index % 2 == 0
-                                      ? EdgeInsets.only(left: 10)
-                                      : EdgeInsets.only(right: 10),
-                                  child: GestureDetector(
-                                    onTap: () async {
-                                      //sayfadan geldikten sonra zikirleri yenile
-                                      final result = await Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => DhikrPage(
-                                            zikir: zikirList[index],
-                                          ),
-                                        ),
-                                      );
 
-                                      // Geri döndükten sonra çağrılacak fonksiyon
-                                      addedFunction();
-                                    },
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 20),
+              child: Container(
+                width: double.infinity,
+                height: height * 0.5,
+                child: GridView.builder(
+                  //kaydıurmayı etkinleştirir
+                  physics: AlwaysScrollableScrollPhysics(),
+                  scrollDirection: Axis.vertical,
+                  shrinkWrap: true,
+                  itemCount: zikirList.length + 1,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 10,
+                    mainAxisSpacing: 10,
+                  ),
+                  itemBuilder: (context, index) {
+                    return index == zikirList.length
+                        ? //+ butomnu yeni dua veya zikir eklemöek için
+                        Padding(
+                            padding: index % 2 == 0
+                                ? EdgeInsets.only(left: 10)
+                                : EdgeInsets.only(right: 10),
+                            child: GestureDetector(
+                              onTap: () async {
+                                //yeni dua dialogu açılacak
+                                bool? result = await showDialog<bool>(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return MyDialog(
+                                      addedFunction: addedFunction,
+                                    );
+                                  },
+                                );
+                                if (result != null && result) {
+                                  _fetchZikirler();
+                                }
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                padding: EdgeInsets.all(10),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "Yeni Dua Ekle",
+                                      style: TextStyle(
+                                        fontSize: 20,
                                         color: Colors.green[500],
                                       ),
-                                      padding: EdgeInsets.all(10),
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            zikirList[index].nameLatin,
-                                            style: TextStyle(
-                                              fontSize: 20,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                          Text(
-                                            zikirList[index].nameArabic,
-                                            style: TextStyle(
-                                              fontSize: 16,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                          SizedBox(height: 10),
-                                          Text(
-                                            zikirList[index]
-                                                .currentCount
-                                                .toString(),
-                                            style: TextStyle(
-                                              fontSize: 24,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
+                                    ),
+                                    Icon(
+                                      Icons.add_circle_outline,
+                                      color: Colors.green[500],
+                                      size: 50,
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
+                          )
+                        : Padding(
+                            padding: index % 2 == 0
+                                ? EdgeInsets.only(left: 10)
+                                : EdgeInsets.only(right: 10),
+                            child: GestureDetector(
+                              onTap: () async {
+                                //sayfadan geldikten sonra zikirleri yenile
+                                final result = await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => DhikrPage(
+                                      zikir: zikirList[index],
                                     ),
                                   ),
                                 );
-                        },
-                      ),
-                    ),
-                  ),
+
+                                // Geri döndükten sonra çağrılacak fonksiyon
+                                addedFunction();
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  color: Colors.green[500],
+                                ),
+                                padding: EdgeInsets.all(10),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      zikirList[index].nameLatin,
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    Text(
+                                      zikirList[index].nameArabic,
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    SizedBox(height: 10),
+                                    Text(
+                                      zikirList[index].currentCount.toString(),
+                                      style: TextStyle(
+                                        fontSize: 24,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                  },
+                ),
+              ),
+            ),
           ],
         ),
       )),
