@@ -7,24 +7,27 @@ import 'package:zikirmatik/models/apiservices-models/ayahservices.dart';
 Future<Ayah> getAyah(int ayahNumber) async {
   final response = await http.get(Uri.parse(
       'https://api.alquran.cloud/v1/ayah/$ayahNumber/editions/quran-uthmani,tr.yazir'));
+  try {
+    if (response.statusCode == 200) {
+      // Parse the response body and return an Ayah object
+      var data = jsonDecode(response.body);
+      var ayahData = data['data'][0];
+      var arabicText = ayahData['text'];
+      var turkishText = data['data'][1]['text'];
+      var surahName = ayahData['surah']['name'];
+      var surahNameEnglish = ayahData['surah']['englishName'];
 
-  if (response.statusCode == 200) {
-    // Parse the response body and return an Ayah object
-    var data = jsonDecode(response.body);
-    var ayahData = data['data'][0];
-    var arabicText = ayahData['text'];
-    var turkishText = data['data'][1]['text'];
-    var surahName = ayahData['surah']['name'];
-    var surahNameEnglish = ayahData['surah']['englishName'];
-
-    return Ayah(
-      number: ayahNumber,
-      arabicText: arabicText,
-      turkishText: turkishText,
-      surahName: surahName,
-      surahNanmeEnglish: surahNameEnglish,
-    );
-  } else {
+      return Ayah(
+        number: ayahNumber,
+        arabicText: arabicText,
+        turkishText: turkishText,
+        surahName: surahName,
+        surahNanmeEnglish: surahNameEnglish,
+      );
+    } else {
+      throw Exception('Failed to load ayah');
+    }
+  } catch (e) {
     throw Exception('Failed to load ayah');
   }
 }

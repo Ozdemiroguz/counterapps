@@ -7,32 +7,34 @@ class ZikirService {
 
   Future<Database> get database async {
     if (_database != null) return _database!;
-    _database = await initDB();
+    _database = await _initDB();
     return _database!;
   }
 
-  initDB() async {
-    String path = join(await getDatabasesPath(), 'zikir.db');
-    return openDatabase(path, version: 1,
-        onCreate: (Database db, int version) async {
-      await db.execute('''
-        CREATE TABLE zikirler(
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          nameLatin TEXT,
-          nameArabic TEXT,
-          currentCount INTEGER,
-          totalCount INTEGER
-        )
-      ''');
-    });
+  _initDB() async {
+    String path = join(await getDatabasesPath(), 'zikir2.db');
+    return openDatabase(
+      path,
+      version: 1,
+      onCreate: (Database db, int version) async {
+        await db.execute('''
+          CREATE TABLE zikirler(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nameLatin TEXT,
+            nameArabic TEXT,
+            currentCount INTEGER,
+            totalCount INTEGER,
+            forgiven TEXT
+          )
+        ''');
+      },
+    );
   }
 
   Future<bool> insertZikir(Zikir zikir) async {
     try {
       final db = await database;
-      Map<String, dynamic> zikirMap = zikir.toMap();
-      zikirMap.remove('id');
-      await db.insert('zikirler', zikirMap,
+      await db.insert('zikirler', zikir.toMap(),
           conflictAlgorithm: ConflictAlgorithm.replace);
       return true;
     } catch (e) {
@@ -43,14 +45,9 @@ class ZikirService {
   Future<List<Zikir>> getZikirler() async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query('zikirler');
+
     return List.generate(maps.length, (i) {
-      return Zikir(
-        id: maps[i]['id'],
-        nameLatin: maps[i]['nameLatin'],
-        nameArabic: maps[i]['nameArabic'],
-        currentCount: maps[i]['currentCount'],
-        totalCount: maps[i]['totalCount'],
-      );
+      return Zikir.fromMap(maps[i]);
     });
   }
 

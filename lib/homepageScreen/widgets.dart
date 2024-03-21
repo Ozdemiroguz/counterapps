@@ -29,21 +29,21 @@ class _MyDialogState extends State<MyDialog> {
     ),
     Dua(
       id: 3,
-      nameLatin: "La havle vela kuvvete illa billah",
-      nameArabic: "لا حول ولا قوة إلا بالله",
-      dua: "La havle vela kuvvete illa billah",
-    ),
-    Dua(
-      id: 4,
       nameLatin: "Allahu Ekber",
       nameArabic: "الله أكبر",
       dua: "Allahu Ekber",
     ),
     Dua(
-      id: 5,
+      id: 4,
       nameLatin: "La ilahe illallah",
       nameArabic: "لا إله إلا الله",
       dua: "La ilahe illallah",
+    ),
+    Dua(
+      id: 5,
+      nameLatin: "La havle vela kuvvete illa billah",
+      nameArabic: "لا حول ولا قوة إلا بالله",
+      dua: "La havle vela kuvvete illa billah",
     ),
     Dua(
       id: 6,
@@ -258,6 +258,7 @@ class _MyDialogState extends State<MyDialog> {
                         nameArabic: dua.nameArabic,
                         currentCount: int.parse(_startController.text),
                         totalCount: int.parse(_endController.text),
+                        forgiven: [],
                       );
                       bool result = await _zikirService.insertZikir(zikir);
                       if (result) {
@@ -292,6 +293,7 @@ class _MyDialogState extends State<MyDialog> {
                         nameArabic: "",
                         currentCount: int.parse(_startController.text),
                         totalCount: int.parse(_endController.text),
+                        forgiven: [],
                       );
 
                       bool result = await _zikirService.insertZikir(zikir);

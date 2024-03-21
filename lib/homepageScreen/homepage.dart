@@ -5,12 +5,11 @@ import 'package:zikirmatik/models/apiservices-models/ayahservices.dart';
 import 'package:zikirmatik/models/apiservices-models/prayermodel.dart';
 import 'package:zikirmatik/models/apiservices-models/prayerservices.dart';
 import 'package:zikirmatik/models/model.dart';
+import 'package:zikirmatik/models/service.dart';
 import 'package:zikirmatik/models/timeparse.dart';
-import 'package:zikirmatik/testscreens/Mydropdown.dart';
-import 'package:zikirmatik/testscreens/namazvakitleri.dart';
+
 import 'package:zikirmatik/testscreens/testscreen.dart';
 import 'package:zikirmatik/zikirPage.dart';
-import '../main.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -18,15 +17,16 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  ZikirDatabaseService _dbService = ZikirDatabaseService();
-
+  ZikirService _dbService = ZikirService();
   List<Zikir> zikirList = [];
+  // bilindik vir ayet oluştur
   Ayah ayah = Ayah(
-      number: -1,
-      arabicText: "Yükleniyor...",
-      turkishText: "Yükleniyor...",
-      surahName: "Yükleniyor...",
-      surahNanmeEnglish: "Yükleniyor");
+    number: 1,
+    arabicText: "Bismillahirrahmanirrahim",
+    turkishText: "Rahman ve Rahim olan Allah'ın adıyla",
+    surahName: "Fatiha",
+    surahNanmeEnglish: "Fatiha",
+  );
 
   PrayerTimes prayerTimes = PrayerTimes(date: "Yükleniyor...", times: [
     "Yükleniyor...",
@@ -78,22 +78,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Allah Kabul Etsin!'),
-        //
-        actions: [
-          IconButton(
-              icon: Icon(MyApp.themeNotifier.value == ThemeMode.light
-                  ? Icons.dark_mode
-                  : Icons.light_mode),
-              onPressed: () {
-                MyApp.themeNotifier.value =
-                    MyApp.themeNotifier.value == ThemeMode.light
-                        ? ThemeMode.dark
-                        : ThemeMode.light;
-              })
-        ],
-      ),
+      appBar: appBar(),
       body: Center(
           child: SingleChildScrollView(
         child: Column(
@@ -111,6 +96,7 @@ class _HomePageState extends State<HomePage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
                         getFormattedDate(
@@ -122,6 +108,13 @@ class _HomePageState extends State<HomePage> {
                           color: Colors.white,
                         ),
                       ),
+                      IconButton(
+                          onPressed: () {
+                            //fetch infos
+                            _fetchAyah();
+                            _fetchPrayerTimes();
+                          },
+                          icon: Icon(Icons.refresh))
                     ],
                   ),
                   Text(
@@ -264,60 +257,109 @@ class _HomePageState extends State<HomePage> {
                               ),
                             ),
                           )
-                        : Padding(
-                            padding: index % 2 == 0
-                                ? EdgeInsets.only(left: 10)
-                                : EdgeInsets.only(right: 10),
-                            child: GestureDetector(
-                              onTap: () async {
-                                //sayfadan geldikten sonra zikirleri yenile
-                                final result = await Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => DhikrPage(
-                                      zikir: zikirList[index],
+                        : Stack(
+                            children: [
+                              Padding(
+                                padding: index % 2 == 0
+                                    ? EdgeInsets.only(left: 10)
+                                    : EdgeInsets.only(right: 10),
+                                child: GestureDetector(
+                                  onTap: () async {
+                                    //sayfadan geldikten sonra zikirleri yenile
+                                    final result = await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => DhikrPage(
+                                          zikir: zikirList[index],
+                                        ),
+                                      ),
+                                    );
+
+                                    // Geri döndükten sonra çağrılacak fonksiyon
+                                    addedFunction();
+                                  },
+                                  child: Container(
+                                    width: double.infinity,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      color: Colors.green[500],
+                                    ),
+                                    padding: EdgeInsets.all(10),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          zikirList[index].nameLatin,
+                                          style: TextStyle(
+                                            fontSize: 20,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                        Text(
+                                          zikirList[index].nameArabic,
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                        SizedBox(height: 10),
+                                        Text(
+                                          zikirList[index]
+                                              .currentCount
+                                              .toString(),
+                                          style: TextStyle(
+                                            fontSize: 24,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                        Row(
+                                          children: [
+                                            Text("Bağışlanan zikirler: ")
+                                          ],
+                                        )
+                                      ],
                                     ),
                                   ),
-                                );
-
-                                // Geri döndükten sonra çağrılacak fonksiyon
-                                addedFunction();
-                              },
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color: Colors.green[500],
-                                ),
-                                padding: EdgeInsets.all(10),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      zikirList[index].nameLatin,
-                                      style: TextStyle(
-                                        fontSize: 20,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                    Text(
-                                      zikirList[index].nameArabic,
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                    SizedBox(height: 10),
-                                    Text(
-                                      zikirList[index].currentCount.toString(),
-                                      style: TextStyle(
-                                        fontSize: 24,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ],
                                 ),
                               ),
-                            ),
+                              Positioned(
+                                  top: 0,
+                                  right: 0,
+                                  child: IconButton(
+                                    icon:
+                                        Icon(Icons.close, color: Colors.white),
+                                    onPressed: () async {
+                                      //dialog açılacak
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            title: Text(
+                                                "Silmek istediğinize emin misiniz?"),
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                },
+                                                child: Text("Hayır"),
+                                              ),
+                                              TextButton(
+                                                onPressed: () async {
+                                                  await _dbService.deleteZikir(
+                                                      zikirList[index].id);
+                                                  addedFunction();
+                                                  Navigator.pop(context);
+                                                },
+                                                child: Text("Evet"),
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      );
+                                    },
+                                  )),
+                            ],
                           );
                   },
                 ),
@@ -359,6 +401,23 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
+    );
+  }
+
+  AppBar appBar() {
+    return AppBar(
+      title: Text("Zikir Matik"),
+      actions: [
+        IconButton(
+          icon: Icon(Icons.add),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ZikirEklemeSayfasi()),
+            );
+          },
+        ),
+      ],
     );
   }
 }

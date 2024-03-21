@@ -106,7 +106,12 @@ class _ZikirEklemeSayfasiState extends State<ZikirEklemeSayfasi> {
   final ZikirService _zikirService = ZikirService();
   final _formKey = GlobalKey<FormState>();
   final _zikir = Zikir(
-      id: 0, nameLatin: '', nameArabic: '', currentCount: 0, totalCount: 0);
+      id: 0,
+      nameLatin: '',
+      nameArabic: '',
+      currentCount: 0,
+      totalCount: 0,
+      forgiven: []);
 
   @override
   Widget build(BuildContext context) {
