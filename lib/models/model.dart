@@ -24,7 +24,7 @@ class Zikir {
       'nameArabic': nameArabic,
       'currentCount': currentCount,
       'totalCount': totalCount,
-      'forgiven': forgiven.join(','),
+      'forgiven': forgiven == [] ? '' : forgiven.join(','),
     };
   }
 
@@ -35,7 +35,8 @@ class Zikir {
       nameArabic: map['nameArabic'],
       currentCount: map['currentCount'],
       totalCount: map['totalCount'],
-      forgiven: map['forgiven'].split(',').toList(),
+      //forgiven boşsa boş bir liste döndürüyor
+      forgiven: map['forgiven'] == '' ? [] : map['forgiven'].split(','),
     );
   }
 }

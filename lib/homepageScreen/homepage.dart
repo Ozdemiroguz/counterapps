@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:zikirmatik/homepageScreen/widgets.dart';
+import 'package:zikirmatik/main.dart';
 import 'package:zikirmatik/models/apiservices-models/ayah.dart';
 import 'package:zikirmatik/models/apiservices-models/ayahservices.dart';
 import 'package:zikirmatik/models/apiservices-models/prayermodel.dart';
@@ -406,17 +407,19 @@ class _HomePageState extends State<HomePage> {
 
   AppBar appBar() {
     return AppBar(
-      title: Text("Zikir Matik"),
+      title: Text('Allah Kabul Etsin!'),
+      //
       actions: [
         IconButton(
-          icon: Icon(Icons.add),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => ZikirEklemeSayfasi()),
-            );
-          },
-        ),
+            icon: Icon(MyApp.themeNotifier.value == ThemeMode.light
+                ? Icons.dark_mode
+                : Icons.light_mode),
+            onPressed: () {
+              MyApp.themeNotifier.value =
+                  MyApp.themeNotifier.value == ThemeMode.light
+                      ? ThemeMode.dark
+                      : ThemeMode.light;
+            })
       ],
     );
   }
