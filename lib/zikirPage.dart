@@ -16,8 +16,8 @@ class DhikrPage extends StatefulWidget {
 }
 
 class _DhikrPageState extends State<DhikrPage> {
-  int dhikrCount = 0;
   ZikirService _zikirService = ZikirService();
+  TextEditingController controllerAdd = TextEditingController();
 
   void incrementDhikrCount() {
     setState(() {});
@@ -40,6 +40,7 @@ class _DhikrPageState extends State<DhikrPage> {
               Text(
                 widget.zikir.nameLatin,
                 style: TextStyle(fontSize: 48),
+                textAlign: TextAlign.center,
               ),
               Text(
                 widget.zikir.nameArabic,
@@ -50,70 +51,14 @@ class _DhikrPageState extends State<DhikrPage> {
                 style: TextStyle(fontSize: 56),
               ),
               Text(
+                textAlign: TextAlign.center,
                 "(${sayiYaziyaCevir(widget.zikir.currentCount)})",
                 style: TextStyle(fontSize: 16),
               ),
               SizedBox(
                 height: 20,
               ),
-              SizedBox(
-                  height: 250,
-                  child: Column(
-                    children: [
-                      widget.zikir.forgiven.isEmpty
-                          ? Container(
-                              child: Text(
-                              "Bağışlanan yok",
-                              style: TextStyle(fontSize: 24),
-                            ))
-                          : Padding(
-                              padding:
-                                  const EdgeInsets.only(left: 20, right: 20),
-                              child: Table(
-                                children: [
-                                  TableRow(children: [
-                                    Text(
-                                      'Bağışlananlar',
-                                      style: TextStyle(fontSize: 24),
-                                    ),
-                                    Text(
-                                      'Sayı',
-                                      style: TextStyle(fontSize: 24),
-                                    ),
-                                  ]),
-                                  for (int i = 0;
-                                      i < widget.zikir.forgiven.length;
-                                      i++)
-                                    TableRow(children: [
-                                      Text(
-                                        widget.zikir.forgiven[i].split('*')[0],
-                                        style: TextStyle(fontSize: 24),
-                                      ),
-                                      Row(
-                                        children: [
-                                          Text(
-                                            widget.zikir.forgiven[i]
-                                                .split('*')[1],
-                                            style: TextStyle(fontSize: 24),
-                                          ),
-                                          Spacer(),
-                                          IconButton(
-                                            icon: Icon(Icons.delete),
-                                            onPressed: () {
-                                              widget.zikir.forgiven.removeAt(i);
-                                              _zikirService
-                                                  .updateZikir(widget.zikir);
-                                              setState(() {});
-                                            },
-                                          ),
-                                        ],
-                                      )
-                                    ]),
-                                ],
-                              ),
-                            )
-                    ],
-                  )),
+              forgivenTable(),
               Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: Row(
@@ -126,6 +71,7 @@ class _DhikrPageState extends State<DhikrPage> {
                       width: 100,
                       height: 50,
                       child: TextFormField(
+                        controller: controllerAdd,
                         decoration: InputDecoration(
                           labelText: 'Ekle',
                           labelStyle: TextStyle(color: Colors.green),
@@ -135,15 +81,35 @@ class _DhikrPageState extends State<DhikrPage> {
                           //sol üst ve sağ alt köşeleri yuvarlak yapar
                         ),
                         keyboardType: TextInputType.number,
-                        onChanged: (value) {
-                          dhikrCount = int.parse(value);
-                        },
+                        onChanged: (value) {},
                       ),
                     ),
                     SizedBox(
                       height: 50,
                       child: ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          //sayı girilmediyse ,0 ise ve sayı dışında bir şey girildiyse hata mesajı ver
+                          if (controllerAdd.text.isEmpty ||
+                              controllerAdd.text == '0' ||
+                              !RegExp(r'^[0-9]*$')
+                                  .hasMatch(controllerAdd.text)) {
+                            //hata mesajı
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: Text('Lütfen bir sayı giriniz'),
+                              duration: Duration(seconds: 2),
+                            ));
+                            return;
+                          }
+                          widget.zikir.currentCount +=
+                              int.parse(controllerAdd.text);
+                          _zikirService.updateZikir(widget.zikir);
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content: Text('Sayı eklendi'),
+                            duration: Duration(seconds: 2),
+                          ));
+                          controllerAdd.clear();
+                          setState(() {});
+                        },
                         child: Text(
                           'Ekle',
                           style: TextStyle(fontSize: 24, color: Colors.white),
@@ -204,6 +170,7 @@ class _DhikrPageState extends State<DhikrPage> {
         ),
         onPressed: () {
           TextEditingController controller = TextEditingController();
+          TextEditingController controller1 = TextEditingController();
           //kime bağışlanacağını dialog ile sor ve bağışla
           //showdialog
           showDialog(
@@ -222,7 +189,7 @@ class _DhikrPageState extends State<DhikrPage> {
                   //ortala
 
                   content: SizedBox(
-                    height: 80,
+                    height: 150,
                     child: Column(
                       //kime baıişlanacağını sor
                       children: [
@@ -230,6 +197,19 @@ class _DhikrPageState extends State<DhikrPage> {
                           controller: controller,
                           decoration: InputDecoration(
                             labelText: 'Kime Bağışlanacak?',
+                            labelStyle: TextStyle(color: Colors.green),
+                            border: outlineInputBorder,
+                            focusedBorder: outlineInputBorder,
+                            enabledBorder: outlineInputBorder,
+                          ),
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        TextFormField(
+                          controller: controller1,
+                          decoration: InputDecoration(
+                            labelText: 'Kaç tane bağışlanacak',
                             labelStyle: TextStyle(color: Colors.green),
                             border: outlineInputBorder,
                             focusedBorder: outlineInputBorder,
@@ -254,9 +234,7 @@ class _DhikrPageState extends State<DhikrPage> {
                     ),
                     ElevatedButton(
                       onPressed: () {
-                        String forgiven = controller.text +
-                            "*" +
-                            widget.zikir.currentCount.toString();
+                        //bağışlanan kişi ve sayı
                         if (widget.zikir.currentCount == 0) {
                           //hata mesajı
                           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -265,11 +243,35 @@ class _DhikrPageState extends State<DhikrPage> {
                           ));
                           return;
                         }
+                        if (controller1.text.isEmpty ||
+                            controller1.text == '0' ||
+                            !RegExp(r'^[0-9]*$').hasMatch(controller1.text)) {
+                          //hata mesajı
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content: Text('Lütfen bir sayı giriniz'),
+                            duration: Duration(seconds: 2),
+                          ));
+                          return;
+                        }
+                        if (int.parse(controller1.text) >
+                            widget.zikir.currentCount) {
+                          //hata mesajı
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content: Text(
+                                'Bağışlanacak sayı, mevcut sayıdan fazla olamaz'),
+                            duration: Duration(seconds: 2),
+                          ));
+                          return;
+                        }
+                        String forgiven =
+                            controller.text + "*" + controller1.text;
                         widget.zikir.forgiven.add(forgiven);
-                        widget.zikir.totalCount += widget.zikir.currentCount;
-                        widget.zikir.currentCount = 0;
+                        widget.zikir.totalCount += int.parse(controller1.text);
                         _zikirService.updateZikir(widget.zikir);
-                        //current count 0 yap
+                        widget.zikir.currentCount -=
+                            int.parse(controller1.text);
+                        controller1.clear();
+                        controller.clear();
 
                         setState(() {});
 
@@ -295,6 +297,124 @@ class _DhikrPageState extends State<DhikrPage> {
         ),
       ),
     );
+  }
+
+  Widget forgivenTable() {
+    return SizedBox(
+        height: 250,
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              widget.zikir.forgiven.isEmpty
+                  ? Container(
+                      child: Text(
+                      "Bağışlanan yok",
+                      style: TextStyle(fontSize: 24),
+                    ))
+                  : Padding(
+                      padding: const EdgeInsets.only(left: 20, right: 20),
+                      child: Table(
+                        children: [
+                          TableRow(children: [
+                            Text(
+                              'Bağışlananlar',
+                              style: TextStyle(fontSize: 24),
+                            ),
+                            Text(
+                              'Sayı',
+                              style: TextStyle(fontSize: 24),
+                            ),
+                          ]),
+                          for (int i = 0;
+                              i < widget.zikir.forgiven.length + 1;
+                              i++)
+                            i == widget.zikir.forgiven.length
+                                ? TableRow(children: [
+                                    Text(
+                                      'Toplam',
+                                      style: TextStyle(fontSize: 24),
+                                    ),
+                                    Text(
+                                      widget.zikir.totalCount.toString(),
+                                      style: TextStyle(fontSize: 24),
+                                    ),
+                                  ])
+                                : TableRow(children: [
+                                    Text(
+                                      widget.zikir.forgiven[i].split('*')[0],
+                                      style: TextStyle(fontSize: 24),
+                                    ),
+                                    Row(
+                                      children: [
+                                        Text(
+                                          widget.zikir.forgiven[i]
+                                              .split('*')[1],
+                                          style: TextStyle(fontSize: 24),
+                                        ),
+                                        Spacer(),
+                                        IconButton(
+                                          icon: Icon(Icons.delete),
+                                          onPressed: () {
+                                            //alert dialog ile sor
+                                            showDialog(
+                                                context: context,
+                                                builder: (context) =>
+                                                    AlertDialog(
+                                                      title: Text('Sil'),
+                                                      content: Text(
+                                                          'Bu bağışı silmek istediğinize emin misiniz?'),
+                                                      actions: [
+                                                        ElevatedButton(
+                                                            onPressed: () {
+                                                              Navigator.pop(
+                                                                  context);
+                                                            },
+                                                            child:
+                                                                Text('İptal')),
+                                                        ElevatedButton(
+                                                            onPressed: () {
+                                                              Navigator.pop(
+                                                                  context);
+                                                              widget.zikir
+                                                                      .totalCount -=
+                                                                  int.parse(widget
+                                                                      .zikir
+                                                                      .forgiven[
+                                                                          i]
+                                                                      .split(
+                                                                          '*')[1]);
+                                                              widget.zikir
+                                                                      .currentCount +=
+                                                                  int.parse(widget
+                                                                      .zikir
+                                                                      .forgiven[
+                                                                          i]
+                                                                      .split(
+                                                                          '*')[1]);
+
+                                                              widget.zikir
+                                                                  .forgiven
+                                                                  .removeAt(i);
+                                                              _zikirService
+                                                                  .updateZikir(
+                                                                      widget
+                                                                          .zikir);
+                                                              setState(() {});
+                                                            },
+                                                            child: Text('Sil')),
+                                                      ],
+                                                    ));
+                                          },
+                                        ),
+                                      ],
+                                    )
+                                  ]),
+                        ],
+                      ),
+                    )
+            ],
+          ),
+        ));
   }
 
   OutlineInputBorder outlineInputBorder = OutlineInputBorder(
@@ -332,6 +452,18 @@ class _DhikrPageState extends State<DhikrPage> {
       'Seksen',
       'Doksan'
     ];
+    List<String> basamaklar = [
+      '',
+      '',
+      'Yüz',
+      'Bin',
+      '',
+      'Yüz',
+      'Milyon',
+      '',
+      'Yüz',
+      'Milyar'
+    ];
     String yazi = '';
 
     if (sayi == 0) {
@@ -340,29 +472,15 @@ class _DhikrPageState extends State<DhikrPage> {
 
     int basamak = 0;
     while (sayi > 0) {
-      if (basamak == 0) {
-        yazi = birler[sayi % 10] + yazi;
-        basamak++;
-      } else if (basamak == 1) {
-        yazi = onlar[sayi % 10] + yazi;
-        basamak++;
-      } else if (basamak == 2) {
-        yazi = birler[sayi % 10] + ' Yüz ' + yazi;
-        basamak++;
-      } else if (basamak == 3) {
-        yazi = birler[sayi % 10] + ' Bin ' + yazi;
-        basamak++;
-      } else if (basamak == 4) {
-        yazi = onlar[sayi % 10] + ' Bin ' + yazi;
-        basamak++;
-      } else if (basamak == 5) {
-        yazi = birler[sayi % 10] + ' Yüz ' + yazi;
-        basamak++;
-      } else if (basamak == 6) {
-        yazi = birler[sayi % 10] + ' Milyon ' + yazi;
-        basamak++;
+      if (basamak % 3 == 0) {
+        yazi = birler[sayi % 10] + ' ' + basamaklar[basamak] + ' ' + yazi;
+      } else if (basamak % 3 == 1) {
+        yazi = onlar[sayi % 10] + ' ' + yazi;
+      } else if (basamak % 3 == 2) {
+        yazi = birler[sayi % 10] + ' ' + basamaklar[basamak] + ' ' + yazi;
       }
       sayi ~/= 10;
+      basamak++;
     }
 
     return yazi.trim();

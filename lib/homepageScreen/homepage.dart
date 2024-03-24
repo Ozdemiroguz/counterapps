@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:zikirmatik/homepageScreen/widgets.dart';
 import 'package:zikirmatik/main.dart';
 import 'package:zikirmatik/models/apiservices-models/ayah.dart';
@@ -9,7 +11,6 @@ import 'package:zikirmatik/models/model.dart';
 import 'package:zikirmatik/models/service.dart';
 import 'package:zikirmatik/models/timeparse.dart';
 
-import 'package:zikirmatik/testscreens/testscreen.dart';
 import 'package:zikirmatik/zikirPage.dart';
 
 class HomePage extends StatefulWidget {
@@ -61,7 +62,7 @@ class _HomePageState extends State<HomePage> {
   _fetchPrayerTimes() async {
     var fetchedPrayerTimes =
         await PrayerTimesService().fetchPrayerTimes("İstanbul");
-    print("Fetch prayer times: $fetchedPrayerTimes");
+
     setState(() {
       prayerTimes = fetchedPrayerTimes[0];
     });
@@ -81,125 +82,131 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: appBar(),
       body: Center(
-          child: SingleChildScrollView(
-        child: Column(
-          children: [
-            // içinde namaz saatleri yazan yeşil arkaplanlı bir container
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: Colors.green,
-              ),
-              width: double.infinity,
-              padding: EdgeInsets.all(10),
-              margin: EdgeInsets.all(10),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        getFormattedDate(
-                          //bugünün tarihi
-                          DateTime.now(),
-                        ),
-                        style: TextStyle(
-                          fontSize: 12,
+          child: Column(
+        children: [
+          // içinde namaz saatleri yazan yeşil arkaplanlı bir container
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              color: Colors.green,
+            ),
+            width: double.infinity,
+            padding: EdgeInsets.all(10),
+            margin: EdgeInsets.all(10),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      getFormattedDate(
+                        //bugünün tarihi
+                        DateTime.now(),
+                      ),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.white,
+                      ),
+                    ),
+                    IconButton(
+                        onPressed: () {
+                          //fetch infos
+                          _fetchAyah();
+                          //_fetchPrayerTimes();
+                        },
+                        icon: Icon(Icons.refresh, color: Colors.white))
+                  ],
+                ),
+                Text(
+                  "Günün Ayeti",
+                  style: TextStyle(
+                    fontSize: 24,
+                    color: Colors.white,
+                  ),
+                ),
+                /* 
+                    Text(
+                      "Namaz Vakitleri",
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.white,
+                      ),
+                    ),
+                  SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          //english prayer times
+                          buildPrayertime(prayerTimes.times[0], "İmsak"),
+                          buildPrayertime(prayerTimes.times[1], "Güneş"),
+                          buildPrayertime(prayerTimes.times[2], "Öğle"),
+                          buildPrayertime(prayerTimes.times[3], "İkindi"),
+                          buildPrayertime(prayerTimes.times[4], "Akşam"),
+                          buildPrayertime(prayerTimes.times[5], "Yatsı"),
+                        ],
+                      ),
+                    ),*/
+                SizedBox(height: 20),
+                Container(
+                    padding: EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      //sol üst ve sağ alt köşeye border görünümü verir
+                      border: Border(
+                        top: BorderSide(
                           color: Colors.white,
+                          width: 1,
+                        ),
+                        bottom: BorderSide(
+                          color: Colors.white,
+                          width: 1,
                         ),
                       ),
-                      IconButton(
-                          onPressed: () {
-                            //fetch infos
-                            _fetchAyah();
-                            _fetchPrayerTimes();
-                          },
-                          icon: Icon(Icons.refresh))
-                    ],
-                  ),
+                    ),
+                    child: Column(
+                      children: [
+                        Text(ayah.arabicText,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.white,
+                            )),
+                        SizedBox(height: 20),
+                        Text(ayah.turkishText,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.white,
+                            )),
+                      ],
+                    )),
+                Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                   Text(
-                    "Namaz Vakitleri",
+                    ayah.number.toString(),
                     style: TextStyle(
-                      fontSize: 20,
+                      fontSize: 10,
                       color: Colors.white,
                     ),
                   ),
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        //english prayer times
-                        buildPrayertime(prayerTimes.times[0], "İmsak"),
-                        buildPrayertime(prayerTimes.times[1], "Güneş"),
-                        buildPrayertime(prayerTimes.times[2], "Öğle"),
-                        buildPrayertime(prayerTimes.times[3], "İkindi"),
-                        buildPrayertime(prayerTimes.times[4], "Akşam"),
-                        buildPrayertime(prayerTimes.times[5], "Yatsı"),
-                      ],
+                  SizedBox(width: 10),
+                  Text(
+                    ayah.surahNanmeEnglish,
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: Colors.white,
                     ),
                   ),
-                  SizedBox(height: 20),
-                  Container(
-                      padding: EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        //sol üst ve sağ alt köşeye border görünümü verir
-                        border: Border(
-                          top: BorderSide(
-                            color: Colors.white,
-                            width: 1,
-                          ),
-                          bottom: BorderSide(
-                            color: Colors.white,
-                            width: 1,
-                          ),
-                        ),
-                      ),
-                      child: Column(
-                        children: [
-                          Text(ayah.arabicText,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.white,
-                              )),
-                          SizedBox(height: 20),
-                          Text(ayah.turkishText,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.white,
-                              )),
-                        ],
-                      )),
-                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                    Text(
-                      ayah.number.toString(),
-                      style: TextStyle(
-                        fontSize: 10,
-                        color: Colors.white,
-                      ),
-                    ),
-                    SizedBox(width: 10),
-                    Text(
-                      ayah.surahNanmeEnglish,
-                      style: TextStyle(
-                        fontSize: 10,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ])
-                ],
-              ),
+                ])
+              ],
             ),
-            //griedview içinde çekilen zikir sayıları ve isimleri
-
-            Padding(
+          ),
+          //griedview içinde çekilen zikir sayıları ve isimleri
+          Expanded(
+            child: Padding(
               padding: const EdgeInsets.only(bottom: 20),
               child: Container(
                 width: double.infinity,
-                height: height * 0.5,
                 child: GridView.builder(
                   //kaydıurmayı etkinleştirir
                   physics: AlwaysScrollableScrollPhysics(),
@@ -292,6 +299,7 @@ class _HomePageState extends State<HomePage> {
                                       children: [
                                         Text(
                                           zikirList[index].nameLatin,
+                                          textAlign: TextAlign.center,
                                           style: TextStyle(
                                             fontSize: 20,
                                             color: Colors.white,
@@ -314,11 +322,14 @@ class _HomePageState extends State<HomePage> {
                                             color: Colors.white,
                                           ),
                                         ),
-                                        Row(
-                                          children: [
-                                            Text("Bağışlanan zikirler: ")
-                                          ],
-                                        )
+                                        SizedBox(height: 20),
+                                        Text(
+                                          "Toplam:${zikirList[index].totalCount}",
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            color: Colors.white,
+                                          ),
+                                        ),
                                       ],
                                     ),
                                   ),
@@ -366,8 +377,8 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       )),
     );
   }
